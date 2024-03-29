@@ -11,40 +11,44 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.pokedex.pokemonList.PokemonListScreen
+import com.example.pokedex.ui.theme.PokedexTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-            NavHost(
-                navController = navController,
-                startDestination = "Pokemon_List_Screen"
-            ) {
-                composable("Pokemon_List_Screen"){
-                    PokemonListScreen(navController = navController)
-                }
-                composable(
-                    "Pokemon_Detail_Screen/{DominantColour}/{PokemonName} ",
-                    arguments = listOf(
-                        navArgument("DominantColour"){
-                            type = NavType.IntType
-                        },
-                        navArgument("PokemonName"){
-                            type = NavType.StringType
+            PokedexTheme {
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "pokemon_list_screen"
+                ) {
+                    composable("pokemon_list_screen") {
+                        PokemonListScreen(navController = navController)
+                    }
+                    composable(
+                        "pokemon_detail_screen/{dominantColor}/{pokemonName}",
+                        arguments = listOf(
+                            navArgument("dominantColor") {
+                                type = NavType.IntType
+                            },
+                            navArgument("pokemonName") {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) {
+                        val dominantColor = remember {
+                            val color = it.arguments?.getInt("dominantColor")
+                            color?.let { Color(it) } ?: Color.White
+                        }
+                        val pokemonName = remember {
+                            it.arguments?.getString("pokemonName")
                         }
 
-                    )
-                ){
-                    val DominantColour = remember {
-                        val color = it.arguments?.getInt("DominantColour")
-                        color?.let{ Color(it) } ?: Color.White
-                    }
-                    val PokemonName = remember {
-                        it.arguments?.getString("PokemonName")
                     }
                 }
-
             }
         }
     }
